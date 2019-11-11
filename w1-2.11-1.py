@@ -12,7 +12,6 @@ a = 0
 my_list = []
 
 while a <= 100:
-
     a = input()
     if a.isnumeric():
         a = int(a)
