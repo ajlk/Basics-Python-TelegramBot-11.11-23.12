@@ -17,9 +17,9 @@ def does_it_pass(var):
         print("Only numbers allowed.")
         quit()
 
-    # The check if a value is positive
+    # The check if a value is greater than zero
     if float(var) <= 0:
-        print("Only positive values allowed.")
+        print("Values shall be greater than zero.")
         quit()
 
     return float(var)
