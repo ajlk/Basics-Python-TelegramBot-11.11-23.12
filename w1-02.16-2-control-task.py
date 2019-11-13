@@ -47,11 +47,14 @@ def to_do_cases(first_val, second_val, operations):
 
 # ---------------------------------
 
-firstVal = input("Please enter a first value" + "\n")
+# firstVal = input("Please enter a first value" + "\n")
+firstVal = input()
 is_number(firstVal)
-secondVal = input("Please enter a second value" + "\n")
+# secondVal = input("Please enter a second value" + "\n")
+secondVal = input()
 is_number(secondVal)
-operation = input("Please enter an operation type: \"+\", \"-\", \"/\", \"*\", \"mod\", \"pow\" or \"div\"" + "\n")
+# operation = input("Please enter an operation type: \"+\", \"-\", \"/\", \"*\", \"mod\", \"pow\" or \"div\"" + "\n")
+operation = input()
 is_operation(operation)
 
 to_do_cases(float(firstVal), float(secondVal), operation)
