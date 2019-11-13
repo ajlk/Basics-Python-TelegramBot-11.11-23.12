@@ -19,7 +19,8 @@ def is_operation(var):
 
 # Where the magic happens
 def to_do_cases(first_val, second_val, operations):
-    if operations == "/" or operations == "mod" or operations == "div" and second_val == 0:
+    if operations == "/" and second_val == 0 or operations == "mod" and second_val == 0 or \
+            operations == "div" and second_val == 0:
         print("Деление на 0!")
         quit()
     if operations == "+":
