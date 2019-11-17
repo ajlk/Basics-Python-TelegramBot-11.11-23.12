@@ -1,3 +1,2 @@
-a = 50
-b = 10
-print(a // b)
+a, b = (int(i) for i in input().split())
+print(a + b)
