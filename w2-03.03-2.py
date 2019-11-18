@@ -7,7 +7,7 @@ def counter(d, lst):
     for i in lst:
         if i not in d:
             d[i] = 1
-        elif i in d:
+        else:
             d[i] += 1
 
 

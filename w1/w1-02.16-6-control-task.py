@@ -14,7 +14,6 @@ if n <= 0:
 
 numVal = 1  # value to be recorded to a cell
 arr = [[0] * n for i in range(n)]
-arr[0][0] = 100
 
 step = 0  # coefficient with step -1
 
