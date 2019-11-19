@@ -5,3 +5,32 @@
 соответствующей этому абитуриенту. Также в конце файла, на отдельной строке, через пробел запишите средние баллы по
 математике, физике и русскому языку по всем абитуриентам"""
 
+# List of students
+listOfStudentsRaw = []
+
+with open("dataset_263138_4.txt") as inf:
+    for line in inf:
+        listOfStudentsRaw.append(line.strip())
+
+# Dictionary with students
+listOfStudents = {}
+for key, value in enumerate(listOfStudentsRaw):
+    listOfStudents[key] = value
+
+# Iterators
+totalPointsMath = 0
+totalPointsPhys = 0
+totalPointsRuss = 0
+totalStudents = 0
+
+for key in listOfStudents:
+    theStudent = listOfStudents[key].split(";")
+    totalPointsMath += float(theStudent[1])
+    totalPointsPhys += float(theStudent[2])
+    totalPointsRuss += float(theStudent[3])
+    totalStudents += 1
+    print((float(theStudent[1]) + float(theStudent[2]) + float(theStudent[3])) / 3)
+
+print(totalPointsMath / totalStudents, end=" ")
+print(totalPointsPhys / totalStudents, end=" ")
+print(totalPointsRuss / totalStudents)
