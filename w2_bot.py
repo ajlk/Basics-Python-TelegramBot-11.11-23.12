@@ -1,7 +1,5 @@
-"""Да, я знаю, что неплохо бы по модулям раскидать. Не успел. В следующей редакции поправлю."""
-
 import telebot
-from datetime import datetime, timedelta
+from datetime import datetime
 from config_bot import TOKEN
 
 bot = telebot.TeleBot(TOKEN)
@@ -72,9 +70,6 @@ def city_handler(message):
             bot.send_message(message.from_user.id, "Послезавтра небесная канцелярия обещала дождь. Возможно с грозой.")
             states[message.from_user.id] = "START"
         else:
-            new_day = datetime.now().day + delta
-            print(datetime.now())
-            print(new_day)
             bot.send_message(message.from_user.id,
                              f"{day}.{month} пасмурно, с прояснениями. +21")
             states[message.from_user.id] = "START"
@@ -92,7 +87,7 @@ def city_handler(message):
         else:
             bot.send_message(message.from_user.id, """Я тебя не понял, попробуй ввести название города ещё раз.
 Ты всегда можешь начать сначала, отправив команду 
-/start""")
+/start"""
 
 
 def data_checker(day, month):
