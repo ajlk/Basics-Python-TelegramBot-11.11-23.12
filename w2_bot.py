@@ -87,7 +87,7 @@ def city_handler(message):
         else:
             bot.send_message(message.from_user.id, """Я тебя не понял, попробуй ввести название города ещё раз.
 Ты всегда можешь начать сначала, отправив команду 
-/start"""
+/start""")
 
 
 def data_checker(day, month):
