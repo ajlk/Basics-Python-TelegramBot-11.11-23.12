@@ -1,3 +1,7 @@
-TEXT = "Мама мыла раму, и ещё какой-то. текст.с точками и пробелами"
+test_set = set()
 
-lext_2= TEXT.sp
+test_set.add(1)
+test_set.add(1)
+test_set.add(2)
+
+print(test_set)
