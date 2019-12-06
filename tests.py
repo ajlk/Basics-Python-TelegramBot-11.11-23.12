@@ -1,7 +1,9 @@
-test_set = set()
+def s(a, *vs, b=10):
+    res = a + b
+    print(vs)
+    for v in vs:
+        res += v
+    return res
 
-test_set.add(1)
-test_set.add(1)
-test_set.add(2)
 
-print(test_set)
+print(s(b=31))
