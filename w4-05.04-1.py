@@ -1,12 +1,3 @@
-"""Вашей программе на вход подаются следующие запросы:
-
-    create <namespace> <parent> –  создать новое пространство имен с именем <namespace> внутри пространства <parent>
-    add <namespace> <var> – добавить в пространство <namespace> переменную <var>
-    get <namespace> <var> – получить имя
-    пространства, из которого будет взята переменная <var> при запросе из пространства <namespace>, или None,
-    если такого пространства не существует """
-
-
 def create(namespaces, namespace, parent):
     if namespace not in namespaces:
         namespaces[namespace] = {}
