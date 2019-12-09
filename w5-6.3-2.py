@@ -12,34 +12,30 @@
 не изменив при этом поведение программы. Имена следует выводить в том же порядке, в котором они идут во входных
 данных. """
 
-num_of_exceptions = input()
 errors_dict = {}
+was_printed = set()
+can_be_skipped = []
+
+num_of_exceptions = input()
 
 for i in range(int(num_of_exceptions)):
     temp_line = input().split()
-    if len(temp_line) == 1:
-        errors_dict[temp_line[0]] = ""
-    else:
-        temp_list = []
-        for j in range(2, len(temp_line)):
-            temp_list.append(temp_line[j])
-        errors_dict[temp_line[0]] = temp_list
-del temp_list
+    child = temp_line[0]
+    parent = temp_line[2:]
+    errors_dict[child] = parent
 del temp_line
 
 num_of_exceptions = input()
-was_printed = set()
-can_be_skipped = []
+
 for i in range(int(num_of_exceptions)):
     var = input()
-    if var in was_printed:
-        continue
     for key, value in errors_dict.items():
         if key == var:
             for z in value:
                 if z in was_printed:
-                    can_be_skipped.append(key)
-            was_printed.add(var)
+                    can_be_skipped.append(var)
+                    break
+    was_printed.add(var)
 
 for i in can_be_skipped:
     print(i)
