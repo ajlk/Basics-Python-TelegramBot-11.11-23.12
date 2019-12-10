@@ -13,10 +13,29 @@
 данных. """
 
 errors_dict = {}
-was_printed = set()
-can_be_skipped = []
+values_was_printed = []
 
 num_of_exceptions = input()
+
+'''def exception_finder(exceptions, start, end, path=[]):
+    path = path + [start]
+    if start == end:
+        return path
+    if start not in exceptions:
+        return []
+    for node in exceptions[start]:
+        if node not in path:
+            newpath = exception_finder(exceptions, node, end, path)
+            if newpath: return newpath
+    return []'''
+
+
+def exception_finder(dictionary, the_error, already_printed):
+    if the_error not in dictionary or dictionary[the_error] == "":
+        return -1
+    else:
+        
+
 
 for i in range(int(num_of_exceptions)):
     temp_line = input().split()
@@ -29,6 +48,17 @@ num_of_exceptions = input()
 
 for i in range(int(num_of_exceptions)):
     var = input()
+    for value_was_printed in values_was_printed:
+        foo = exception_finder(errors_dict, var, value_was_printed)
+        if foo == -1:
+            values_was_printed.append(var)
+            break
+        else:
+
+
+    values_was_printed.append(var)
+
+"""
     for key, value in errors_dict.items():
         if key == var:
             for z in value:
@@ -36,6 +66,6 @@ for i in range(int(num_of_exceptions)):
                     can_be_skipped.append(var)
                     break
     was_printed.add(var)
-
-for i in can_be_skipped:
-    print(i)
+"""
+"""for i in can_be_skipped:
+    print(i)"""

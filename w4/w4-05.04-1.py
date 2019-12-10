@@ -1,3 +1,4 @@
+
 def create(namespaces, namespace, parent):
     if namespace not in namespaces:
         namespaces[namespace] = {}
