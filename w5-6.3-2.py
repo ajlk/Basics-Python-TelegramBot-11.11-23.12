@@ -17,17 +17,6 @@ values_was_printed = []
 
 num_of_exceptions = input()
 
-'''def exception_finder(exceptions, start, end, path=[]):
-    path = path + [start]
-    if start == end:
-        return path
-    if start not in exceptions:
-        return []
-    for node in exceptions[start]:
-        if node not in path:
-            newpath = exception_finder(exceptions, node, end, path)
-            if newpath: return newpath
-    return []'''
 
 
 def exception_finder(dictionary, the_error, already_printed):
