@@ -23,7 +23,7 @@ def exception_finder(dictionary, the_error, already_printed):
     if the_error not in dictionary or dictionary[the_error] == "":
         return -1
     else:
-        
+        pass
 
 
 for i in range(int(num_of_exceptions)):
