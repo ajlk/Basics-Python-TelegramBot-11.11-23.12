@@ -1,9 +1,15 @@
-"""Бот умеет смотреть погоду на сегодня для любого города. Ограничение: города, находящиеся не в России, должны быть
-заданы на английском языке. По всей видимости проблема вызвана неполной локализацией под русский язык.
-Запросы реализованы через библиотеку pyowm."""
+"""- Бот умеет смотреть погоду на сегодня для любого города. Ограничение: города, находящиеся за пределами России или
+Белоруссии, должны быть заданы на английском языке. По всей видимости проблема вызвана неполной локализацией под
+русский язык;
+- Запросы реализованы через библиотеку pyowm;
+- Просмотр погоды на следующие дни прикрутить не успел;
+- Использован API от OWM.
+- Присутствует проблема при введении '/start' два раза подряд. Причину установить не удалось. Буду благодарен за
+ подсказку."""
 
 import telebot
 import pyowm
+
 from datetime import datetime
 from config_bot import TOKEN, OPEN_WEATHER_API_KEY
 
@@ -53,6 +59,21 @@ def current_weather(city):
     return weather_details(obs.get_weather())
 
 
+def forecast(city, what_date):
+    obs = owm.daily_forecast()
+    w = obs.get_weather_at(f'{what_date[1].year}-{what_date[1].month}-{what_date[1].day} 12:00:00+00')
+
+
+def date_checker(day, month):
+    now = datetime.now()
+    then = datetime(now.year, month, day)
+    delta = then.day - now.day
+    if delta < 0:
+        then = datetime(now.year + 1, month, day)
+        delta = then.day - now.day
+    return [delta, then]
+
+
 @BOT.message_handler(func=lambda message: True)
 def dispatcher(message):
     user_id = message.from_user.id
@@ -73,7 +94,7 @@ def start_handler(message):
         BOT.send_message(
             message.from_user.id,
             """Если хочешь, можешь запросить погоду на конкретное число. Формат запроса: ГОРОД DD.MM.
-Используя данный метод, ты можешь узнать погоду на сегодня, и даже заглянуть в будущее на целых три дня!"""
+Используя данный метод, ты можешь узнать погоду на сегодня, и даже заглянуть в будущее на целых четыре дня!"""
         )
         BOT.send_message(
             message.from_user.id,
@@ -91,47 +112,60 @@ def city_handler(message):
     # Проверка на случай, если пользователь решит начать всё с начала.
     if message.text.lower() == "/start":
         states[message.from_user.id] = "START"
+        return
+    # ------------
+    # Смотрим, есть ли дата
+    try:
+        day = int(message.text[-5:-3])
+        month = int(message.text[-2:])
+        is_date = 1
+    except ValueError:
+        is_date = 0
 
-    # ------------
-    # ------------
-    # Если пользователь указал дату, вся магия произойдёт здесь.
-    else:
+    if is_date == 0:
         try:
-            day = int(message.text[-5:-3])
-            month = int(message.text[-2:])
-            is_date = 1
-        except ValueError:
-            is_date = 0
-
-        if is_date == 0:
             weather = current_weather(message.text.lower())
-        if is_date == 1:
-            delta = data_checker(day, month)
+        except pyowm.exceptions.api_response_error.NotFoundError:
+            BOT.send_message(message.from_user.id, """Я тебя не понял, попробуй ввести название города ещё раз.
+Ты всегда можешь начать сначала, отправив команду 
+/start""")
+            return
+
+# =================================
+# Эта часть ещё не готова.
+    if is_date == 1:
+        what_date = date_checker(day, month)
+        if what_date[0] > 4:
+            BOT.send_message(message.from_user.id, """Так далеко в будущее я заглядывать не умею, попробуй 
+изменить дату.
+Ты всегда можешь начать сначала, отправив команду
+/start""")
+        else:
+            try:
+                weather = forecast(message.text.lower(), what_date)
+            except pyowm.exceptions.api_response_error.NotFoundError:
+                BOT.send_message(message.from_user.id, """Я тебя не понял, попробуй ввести название города ещё раз.
+            Ты всегда можешь начать сначала, отправив команду 
+            /start""")
+                return
+# =================================
 
         # ===========================
         # Основной обработчик
-        if weather[1] is None:
-            message_1 = f'''Температура на сегодня в городе {message.text.lower().capitalize()} {weather[0]} {degree_sign}C; 
+    if weather[1] is None:
+        message_1 = f'''Температура на сегодня в городе {message.text.lower().capitalize()} {weather[0]} {degree_sign}C; 
 Скорость ветра {weather[2]} м/с;
 {weather[3]}.'''
-        else:
-            message_1 = f'''Температура на сегодня в городе {message.text.lower().capitalize()} {weather[0]} {degree_sign}C; 
+    else:
+        message_1 = f'''Температура на сегодня в городе {message.text.lower().capitalize()} {weather[0]} {degree_sign}C; 
 {weather[1]}, {weather[2]} м/с;
 {weather[3]}.'''
 
-        BOT.send_message(message.from_user.id, message_1)
-        states[message.from_user.id] = "START"
-    # ===========================
+    BOT.send_message(message.from_user.id, message_1)
+    states[message.from_user.id] = "START"
 
 
-def data_checker(day, month):
-    now = datetime.now()
-    then = datetime(now.year, month, day)
-    delta = then.day - now.day
-    if delta < 0:
-        then = datetime(now.year + 1, month, day)
-        delta = then.day - now.day
-    return delta
+# ===========================
 
 
 BOT.polling()
