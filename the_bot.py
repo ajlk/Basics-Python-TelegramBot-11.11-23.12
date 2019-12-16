@@ -58,7 +58,7 @@ def current_weather(city):
     obs = owm.weather_at_place(city)
     return weather_details(obs.get_weather())
 
-
+# Этот def ещё не готов
 def forecast(city, what_date):
     obs = owm.daily_forecast()
     w = obs.get_weather_at(f'{what_date[1].year}-{what_date[1].month}-{what_date[1].day} 12:00:00+00')
@@ -150,8 +150,8 @@ def city_handler(message):
                 return
 # =================================
 
-        # ===========================
-        # Основной обработчик
+    # ===========================
+    # Основной обработчик
     if weather[1] is None:
         message_1 = f'''Температура на сегодня в городе {message.text.lower().capitalize()} {weather[0]} {degree_sign}C; 
 Скорость ветра {weather[2]} м/с;
