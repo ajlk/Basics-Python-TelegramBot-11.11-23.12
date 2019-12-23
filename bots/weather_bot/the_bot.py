@@ -58,6 +58,7 @@ def current_weather(city):
     obs = owm.weather_at_place(city)
     return weather_details(obs.get_weather())
 
+
 # Этот def ещё не готов
 def forecast(city, what_date):
     obs = owm.daily_forecast()
@@ -131,8 +132,8 @@ def city_handler(message):
 /start""")
             return
 
-# =================================
-# Эта часть ещё не готова.
+    # =================================
+    # Эта часть ещё не готова.
     if is_date == 1:
         what_date = date_checker(day, month)
         if what_date[0] > 4:
@@ -148,7 +149,7 @@ def city_handler(message):
             Ты всегда можешь начать сначала, отправив команду 
             /start""")
                 return
-# =================================
+    # =================================
 
     # ===========================
     # Основной обработчик
