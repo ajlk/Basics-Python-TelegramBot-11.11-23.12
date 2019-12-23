@@ -2,15 +2,13 @@
 Белоруссии, должны быть заданы на английском языке. По всей видимости проблема вызвана неполной локализацией под
 русский язык;
 - Запросы реализованы через библиотеку pyowm;
-- Просмотр погоды на последующие дни прикрутить не успел;
-- Использован API от OWM.
-- Присутствует проблема при введении '/start' два раза подряд. Бот не отзывается. Третий ввод решает проблему.
-Причину установить не удалось. Буду благодарен за подсказку."""
-
-import telebot
-import pyowm
+- Использован API от OWM."""
 
 from datetime import datetime
+
+import keyboards_weather_bot as kb  # клавиатура
+import pyowm
+import telebot
 from config_bot import TOKEN, OPEN_WEATHER_API_KEY
 
 BOT = telebot.TeleBot(TOKEN)
@@ -27,7 +25,7 @@ def weather_details(w):
     temperature = w.get_temperature('celsius').get('temp')
     wind_speed = w.get_wind()['speed']
 
-    if 'deg' in w.get_wind():  # для некоторых городов скорость ветра не указана
+    if 'deg' in w.get_wind():  # для некоторых городов направление ветра не указано
         compassSector = ["Северный ветер",
                          "Северный, северо-восточный ветер",
                          "Северо-восточный ветер",
@@ -58,6 +56,7 @@ def current_weather(city):
     obs = owm.weather_at_place(city)
     return weather_details(obs.get_weather())
 
+
 # Этот def ещё не готов
 def forecast(city, what_date):
     obs = owm.daily_forecast()
@@ -74,15 +73,66 @@ def date_checker(day, month):
     return [delta, then]
 
 
+@BOT.message_handler(commands=['help'])
+def process_help_command(message):
+    BOT.send_message(
+        message.from_user.id,
+        'Я - бот, помогающий узнать погоду в интересующем тебя городе.\n\nНеобходимо выбрать один из предложенных '
+        'вариантов взаимодействия со мной.\n\nПосле выполнения каждого запроса ты снова должны выбрать погоду либо '
+        'на сегодня, либо на определённую дату.'
+    )
+
+
+@BOT.message_handler(commands=['start'])
+def process_start_command(message):
+    BOT.send_message(
+        message.from_user.id,
+        "Привет! Это бот-погода. Я помогу узнать погоду в любом городе.\n\n"
+        "Города, находящиеся за пределами России, должны быть написаны на английском языке.\n\n"
+        "Выбери один из доступных вариантов:",
+        reply_markup=kb.reply_kb)
+
+
 @BOT.message_handler(func=lambda message: True)
 def dispatcher(message):
     user_id = message.from_user.id
     current_user_state = states.get(user_id, "START")
+    # ===============================================
+    # 0 - параметр не определён;
+    # 1 - погода на сегодня;
+    # 2 - погода на определённую дату.
+    check_type = 0
+    # ===============================================
+    if message.text == 'Начать сначала':
+        states[message.from_user.id] = 'START'
+        process_start_command(message)
+    elif message.text == 'Погода на сегодня':
+        check_type = 1
+        states[message.from_user.id] = 'CITY'
+    elif message.text == 'Погода на определённую дату':
+        check_type = 2
+        states[message.from_user.id] = 'CITY'
+    else:
+        if check_type == 0:
+            BOT.send_message(
+                message.from_user.id,
+                'Я тебя не понял.\n'
+                'Выбери один из предложенных вариантов.'
+            )
+        elif check_type == 1:
+            try:
+                weather = current_weather(message.text.lower())
+            except pyowm.exceptions.api_response_error.NotFoundError:
+                BOT.send_message(message.from_user.id, """Я тебя не понял, попробуй ввести название города ещё раз.
+            Ты всегда можешь начать сначала, отправив команду 
+            /start""")
+                return
 
-    if current_user_state == "START":
+
+"""    if current_user_state == "START":
         start_handler(message)
     else:  # current_user_state == "CITY":
-        city_handler(message)
+        city_handler(message)"""
 
 
 def start_handler(message):
@@ -131,8 +181,8 @@ def city_handler(message):
 /start""")
             return
 
-# =================================
-# Эта часть ещё не готова.
+    # =================================
+    # Эта часть ещё не готова.
     if is_date == 1:
         what_date = date_checker(day, month)
         if what_date[0] > 4:
@@ -148,7 +198,7 @@ def city_handler(message):
             Ты всегда можешь начать сначала, отправив команду 
             /start""")
                 return
-# =================================
+    # =================================
 
     # ===========================
     # Основной обработчик
