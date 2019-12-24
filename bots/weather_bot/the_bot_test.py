@@ -68,7 +68,8 @@ def dispatcher(message):
                 message.from_user.id,
                 'Какой город и какая дата тебя интересуют?\n\n'
                 'Формат запроса: ГОРОД DD.MM\n\n'
-                'Запрашиваемая дата не может быть позднее 16-ти дней от текущей.'
+                'Запрашиваемая дата не может быть позднее 4-х дней от текущей.\n'
+                'Город должен быть задан на английском языке!'
             )
         else:
             BOT.send_message(
@@ -94,8 +95,16 @@ def city_handler(message, user_state):
             )
             return
         the_city = message.text.lower()
+
+        # ======== ОСНОВНОЙ ОБРАБОТЧИК ================================
+        the_message = defs.answer_constructor_today(the_city, weather)
+
+        BOT.send_message(message.from_user.id, the_message)
+        states[message.from_user.id] = 0  # обнуление состояния
+        # =============================================================
+
     else:  # user_state==2
-        # =======================================
+        # =============================================================
         # Проверяем корректность введённой даты
         try:
             day = int(message.text[-5:-3])
@@ -108,33 +117,40 @@ def city_handler(message, user_state):
             )
             return
 
-        the_date = defs.date_checker(day, month)
-        if the_date[0] > 5:
+        delta_and_date = defs.date_checker(day, month)
+        if delta_and_date[0] > 4 or delta_and_date[0] < 1:
             BOT.send_message(
                 message.from_user.id,
                 'Запрашиваемая дата выходит за допустимые пределы.\n\n'
-                'Пожалуйста введи другую дату, лежащую в пределах 5-ти дней от текущей.'
+                'Пожалуйста введи другую дату, лежащую в пределах 4-х дней от текущей.'
             )
             return
-        # =======================================
+        # =============================================================
 
         try:
-            weather = defs.forecast(message.text[:-5].lower(), the_date)
+            weather = defs.forecast(message.text[:-5].lower(), delta_and_date[1])
         except pyowm.exceptions.api_response_error.NotFoundError:
             BOT.send_message(
                 message.from_user.id,
                 'Я тебя не понял. Попробуй ввести название города ещё раз.'
             )
             return
-    # ===========================
-    # Основной обработчик
-    the_message = defs.answer_constructor(the_city, weather)
+        if weather == 404:
+            BOT.send_message(
+                message.from_user.id,
+                'Я тебя не понял. Попробуй ввести название города ещё раз (на английском языке).'
+            )
+            return
 
-    BOT.send_message(message.from_user.id, the_message)
-    states[message.from_user.id] = 0  # обнуление состояния
+        the_city = message.text[:-5].lower()
+        the_date = message.text[-5:]
 
+        # ======== ОСНОВНОЙ ОБРАБОТЧИК ================================
+        the_message = defs.answer_constructor_forecast(the_city, the_date, weather)
 
-# ===========================
+        BOT.send_message(message.from_user.id, the_message)
+        states[message.from_user.id] = 0  # обнуление состояния
+        # =============================================================
 
 
 BOT.polling()
