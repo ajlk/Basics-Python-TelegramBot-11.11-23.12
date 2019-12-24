@@ -49,10 +49,6 @@ def forecast(city, date):
     return [weather_night, weather_day]
 
 
-# obs = owm.three_hours_forecast(city)
-# return weather_details(obs.get_forecast())
-
-
 # определение средней температуры, направления и силы ветра, краткого дополнительного описания
 def weather_details_today(w):
     city_weather = w.get_weather()
