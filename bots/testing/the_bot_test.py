@@ -17,7 +17,7 @@ BOT = telebot.TeleBot(TOKEN)
 degree_sign = u'\N{DEGREE SIGN}'
 
 try:
-    data = json.load(open('data.json', 'r', encoding='utf-8'))
+    data = json.load(open('../weather_bot/data.json', 'r', encoding='utf-8'))
 except FileNotFoundError:
     data = {
         'states': {}
@@ -29,7 +29,7 @@ def change_data(key, user_id, value):
     data[key][user_id] = value
     json.dump(
         data,
-        open('data.json', 'w', encoding='utf-8'),
+        open('../weather_bot/data.json', 'w', encoding='utf-8'),
         indent=2,
         ensure_ascii=False
     )
