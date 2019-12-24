@@ -4,15 +4,15 @@
 - Запросы реализованы через библиотеку pyowm;
 - Использован API от OWM."""
 
-from config_bot import TOKEN, OPEN_WEATHER_API_KEY
-
 import keyboards_weather_bot as kb  # клавиатура
 import defs_weather_bot as defs  # проверка погоды
 import telebot
 import pyowm
 import json
+import os
 
-BOT = telebot.TeleBot(TOKEN)
+token = os.environ['TELEGRAM_TOKEN']
+BOT = telebot.TeleBot(token)
 
 degree_sign = u'\N{DEGREE SIGN}'
 

@@ -3,10 +3,12 @@
 from datetime import datetime
 import requests
 import pyowm
-from config_bot import TOKEN, OPEN_WEATHER_API_KEY
+import os
+
+OWM_API_KEY = os.environ['OWM_API_KEY']
 
 # локализация
-owm = pyowm.OWM(OPEN_WEATHER_API_KEY, language='RU')
+owm = pyowm.OWM(OWM_API_KEY, language='RU')
 
 
 # смотрим погоду на сегодня
@@ -20,7 +22,7 @@ def forecast(city, date):
     api_url = 'http://api.openweathermap.org/data/2.5/forecast'
     params = {
         'q': city,
-        'appid': OPEN_WEATHER_API_KEY,
+        'appid': OWM_API_KEY,
         'units': 'metric',
         'lang': 'ru'
     }
