@@ -10,11 +10,29 @@ import keyboards_weather_bot as kb  # клавиатура
 import defs_weather_bot as defs  # проверка погоды
 import telebot
 import pyowm
+import json
 
 BOT = telebot.TeleBot(TOKEN)
 
-states = {}
 degree_sign = u'\N{DEGREE SIGN}'
+
+try:
+    data = json.load(open('data.json', 'r', encoding='utf-8'))
+except FileNotFoundError:
+    data = {
+        'states': {}
+    }
+
+
+# изменение состояний
+def change_data(key, user_id, value):
+    data[key][user_id] = value
+    json.dump(
+        data,
+        open('data.json', 'w', encoding='utf-8'),
+        indent=2,
+        ensure_ascii=False
+    )
 
 
 @BOT.message_handler(commands=['help'])
@@ -40,14 +58,17 @@ def process_start_command(message):
 
 @BOT.message_handler(func=lambda message: True)
 def dispatcher(message):
-    user_id = message.from_user.id
+    user_id = str(message.from_user.id)
 
     if message.text == 'Начать сначала':
-        states[message.from_user.id] = 0
+        change_data('states', user_id, 0)
         process_start_command(message)
         return
 
-    current_user_state = states.get(user_id, 0)
+    if data['states'][user_id]:
+        current_user_state = data['states'][user_id]
+    else:
+        current_user_state = 0
     # ===============================================
     # 0 - параметр не определён;
     # 1 - погода на сегодня;
@@ -57,13 +78,13 @@ def dispatcher(message):
     # =============ОПРЕДЕЛЯЕМ ПАРАМЕТР ЗАПРОСА============= #
     if current_user_state == 0:
         if message.text == 'Погода на сегодня':
-            states[message.from_user.id] = 1
+            change_data('states', user_id, 1)
             BOT.send_message(
                 message.from_user.id,
                 'Для какого города ты хотел бы узнать погоду на сегодня?'
             )
         elif message.text == 'Погода на определённую дату':
-            states[message.from_user.id] = 2
+            change_data('states', user_id, 2)
             BOT.send_message(
                 message.from_user.id,
                 'Какой город и какая дата тебя интересуют?\n\n'
@@ -81,10 +102,10 @@ def dispatcher(message):
     # =============КОНЕЦ ОПРЕДЕЛЕНИЯ ПАРАМЕТРА ЗАПРОСА============= #
 
     if current_user_state != 0:
-        city_handler(message, current_user_state)
+        city_handler(message, current_user_state, user_id)
 
 
-def city_handler(message, user_state):
+def city_handler(message, user_state, user_id):
     if user_state == 1:
         try:
             weather = defs.current_weather(message.text.lower())
@@ -100,7 +121,7 @@ def city_handler(message, user_state):
         the_message = defs.answer_constructor_today(the_city, weather)
 
         BOT.send_message(message.from_user.id, the_message)
-        states[message.from_user.id] = 0  # обнуление состояния
+        change_data('states', user_id, 0)  # обнуление состояния
         # =============================================================
 
     else:  # user_state==2
@@ -122,19 +143,12 @@ def city_handler(message, user_state):
             BOT.send_message(
                 message.from_user.id,
                 'Запрашиваемая дата выходит за допустимые пределы.\n\n'
-                'Пожалуйста введи другую дату, лежащую в пределах 4-х дней от текущей.'
+                'Пожалуйста повтори запрос с другой датой, лежащей в пределах 4-х дней от текущей.'
             )
             return
         # =============================================================
 
-        try:
-            weather = defs.forecast(message.text[:-5].lower(), delta_and_date[1])
-        except pyowm.exceptions.api_response_error.NotFoundError:
-            BOT.send_message(
-                message.from_user.id,
-                'Я тебя не понял. Попробуй ввести название города ещё раз.'
-            )
-            return
+        weather = defs.forecast(message.text[:-5].lower(), delta_and_date[1])
         if weather == 404:
             BOT.send_message(
                 message.from_user.id,
@@ -149,8 +163,9 @@ def city_handler(message, user_state):
         the_message = defs.answer_constructor_forecast(the_city, the_date, weather)
 
         BOT.send_message(message.from_user.id, the_message)
-        states[message.from_user.id] = 0  # обнуление состояния
+        change_data('states', user_id, 0)  # обнуление состояния
         # =============================================================
 
 
 BOT.polling()
+print('Бот остановлен.')

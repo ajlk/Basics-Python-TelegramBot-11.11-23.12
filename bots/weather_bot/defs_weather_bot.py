@@ -149,7 +149,7 @@ def date_checker(day, month):
 def answer_constructor_today(the_city, weather):
     degree_sign = u'\N{DEGREE SIGN}'  # знак градуса
 
-    city_details_string = f'Погода на сегодня для города {the_city.capitalize()}:\n'
+    city_details_string = f'Погода на сегодня для города {the_city.capitalize()}:\n\n'
 
     temperature = weather[0]
     if temperature is not None:
@@ -191,13 +191,13 @@ def answer_constructor_forecast(the_city, the_date, weather):
     # =================== НОЧЬ ========================================
     temperature_night = weather[0][0]
     if temperature_night is not None:
-        temperature_night_string = f'Температура воздуха ночью {temperature_night} {degree_sign}C;\n'
+        temperature_night_string = f'Температура воздуха {temperature_night} {degree_sign}C;\n'
     else:
         temperature_night_string = ''
 
     humidity_night = weather[0][1]
     if humidity_night is not None:
-        humidity_night_string = f'Влажность воздуха ночью {humidity_night} %;\n'
+        humidity_night_string = f'Влажность воздуха {humidity_night} %;\n'
     else:
         humidity_night_string = ''
 
@@ -217,18 +217,18 @@ def answer_constructor_forecast(the_city, the_date, weather):
     if detailed_info_night is not None:
         detailed_info_night_string = f'{detailed_info_night}.\n\n'
     else:
-        detailed_info_night_string = '\n'
+        detailed_info_night_string = '\n\n'
     # =================================================================
     # =================== ДЕНЬ ========================================
     temperature_day = weather[1][0]
     if temperature_day is not None:
-        temperature_day_string = f'Температура воздуха днём {temperature_day} {degree_sign}C;\n'
+        temperature_day_string = f'Температура воздуха {temperature_day} {degree_sign}C;\n'
     else:
         temperature_day_string = ''
 
     humidity_day = weather[1][1]
     if humidity_day is not None:
-        humidity_day_string = f'Влажность воздуха днём {humidity_day} %;\n'
+        humidity_day_string = f'Влажность воздуха {humidity_day} %;\n'
     else:
         humidity_day_string = ''
 
@@ -251,11 +251,13 @@ def answer_constructor_forecast(the_city, the_date, weather):
         detailed_info_day_string = ''
 
     the_message = f'{city_details_string}' \
+                  f'Погода ночью:\n' \
                   f'{temperature_night_string}' \
                   f'{humidity_night_string}' \
                   f'{wind_direction_night_string}' \
                   f'{wind_speed_night_string}' \
                   f'{detailed_info_night_string}' \
+                  f'Погода днём:\n' \
                   f'{temperature_day_string}' \
                   f'{humidity_day_string}' \
                   f'{wind_direction_day_string}' \
