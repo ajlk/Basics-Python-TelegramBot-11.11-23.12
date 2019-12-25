@@ -5,3 +5,4 @@ pyowm==2.10.0
 pyTelegramBotAPI==3.6.6
 python-dateutil==2.8.1
 requests==2.22.0
+redis
